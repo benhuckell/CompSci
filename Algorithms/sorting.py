@@ -136,8 +136,77 @@ class Sorting:
         
         return i+1
 
+    @abstractmethod
+    def counting_sort(nums):
+
+        maxVal = 0
+        for i in range(len(nums)):
+            maxVal = max(maxVal, nums[i])
+
+        count = [0]*(maxVal+1)
+        for i in range(len(nums)):
+            count[nums[i]] += 1
+
+        for i in range(1,len(count)):
+            count[i] += count[i-1]
+
+        index = 0
+        current = 0
+        while index <= maxVal:
+            if(current < count[index]):
+                nums[current] = index
+                current += 1
+            index += 1
+            
+        return nums
+
+    @abstractmethod
+    def counting_sort_digit(nums,exp):
+
+        # get least significant digit
+        count = [0]*10
+        for i in range(len(nums)):
+            newVal = nums[i]//exp
+            digit = newVal % 10
+            count[digit] += 1
+
+        # Create continuous count array
+        for i in range(1,len(count)):
+            count[i] += count[i-1]
+
+        # Create a duplicate empty array to nums
+        output = [0]*len(nums)
+
+        # Populate output based on where each value should go (from looking at count array)
+        i = len(nums)-1
+        while i >= 0:
+            index = (nums[i]//exp)%10
+            output[count[index]-1] = nums[i]
+            count[index] -= 1
+            i -= 1
+
+        # Copy output back to nums
+        for i in range(len(output)):
+            nums[i] = output[i]
+
+        return nums
+
+
+    @abstractmethod
+    def radix_sort(nums):
+
+        # Find max value so that we know the max number of digits
+        maxValue = max(nums)
+
+        exp = 1
+        while maxValue / exp > 1:
+            Sorting.counting_sort_digit(nums,exp)
+            exp *= 10
+
+        return nums
+
 
 if __name__ == "__main__":
-    arr = [7,5,1,4,3,2]
-    sortedArr = Sorting.quick_sort(arr)
+    arr = [72,5,1,4,1,3,2]
+    sortedArr = Sorting.radix_sort(arr)
     print(sortedArr)
